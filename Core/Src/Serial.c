@@ -1,33 +1,17 @@
 /**
-  ************************************* Copyright ****************************** 
-  *
-
+  ************************************* Copyright ******************************
   *                 (C) Copyright 2023,--,China, CUIT.
-  *                            All Rights Reserved
-  *                              
+  *                       All Rights Reserved
   *                     By(JCML)
-    *
-  *    
   * FileName   : Serial.c   
   * Version    : v1.0		
   * Author     : JCML			
-  * Date       : 2023-01-17         
-  * Description: 基于Hal库的串口收发定义函数  
-					PS在使用该函数前请到stm32f1xx_it.h中将
-									void USART1_IRQHandler(void)
-									void DMA1_Channel5_IRQHandler(void)
-							两个函数注释掉
-到"usart.h"中添加
-extern DMA_HandleTypeDef hdma_usart1_rx;
-extern DMA_HandleTypeDef hdma_usart1_tx;
-
-  * May Be Used Function List:  
-1. Head file:
-#include ".h" 
-
-2. Function File:
-
-
+  * Date       : 2023-06-18
+  * Description: 基于Hal库的串口不定长收发库
+  ********** PS由于这个库重写了中断函数，需要在使用该库前请到stm32f1xx_it.h中将*******
+  **********            void USART1_IRQHandler(void)                   *******
+  **********            void DMA1_Channel5_IRQHandler(void)            *******
+	***************************两个函数注释掉*************************************
 ******************************************************************************
  */
 #include <string.h>
@@ -285,7 +269,53 @@ void USART1_IRQHandler(void)
   HAL_UART_IRQHandler(&huart1);
   HAL_UART_Receive_DMA(&huart1, p_IsToReceive, MAX_RX_LEN); //数据处理完毕，重新启动接收
 }
+/*
+ void GetValue(_Values *Value, _PID *pid)
+{//串口GetRxValue使用示例
+	if (strstr(RxDataStr, "SetSpeed")!=NULL)
+	{//设定目标速度值
+		Value->Target_Speed = GetRxValue((char *)RxDataStr, 15);
+		Myprintf("Speed Seted:%.2f\r\n",Value->Target_Speed);
+	}
 
+	else if (strstr(RxDataStr, "SetKp")!=NULL)
+	{//设定Kp值
+		pid->Kp = GetRxValue((char *)RxDataStr, 15);
+		Myprintf("Kp Seted:% 2f\r\n", pid->Kp);
+	}
+
+	else if (strstr(RxDataStr, "SetKi")!=NULL)
+	{//设定Ki值
+		 pid->Ki = GetRxValue((char *)RxDataStr, 15);
+		Myprintf("Ki Seted:% 2f\r\n", pid->Ki);
+	}
+
+	else if (strstr(RxDataStr, "SetKd")!=NULL)
+	{//设定Kd值
+		 pid->Kp = GetRxValue((char *)RxDataStr, 15);
+		Myprintf("Kd Seted:% 2f\r\n", pid->Kp);
+	}
+
+	else if (strstr(RxDataStr, "help")!=NULL)
+	{//获取参数调整帮助
+		Myprintf("调整速度：Speed;\r\n调整PID值分别为：Kp, Ki, Kd\r\n");
+	}
+
+	else if (strstr(RxDataStr, "Value")!=NULL)
+	{//获取当前设定的参数值
+		Myprintf("调整速度:%0f;\r\nKp:%f\r\nKi:%f\r\nKd:%f\r\n", Value->Target_Speed,
+																		 pid->Kp,  pid->Ki,  pid->Kd);
+	}
+	else if (strstr(RxDataStr, "data")!=NULL)
+	{//获取当前接收到的电磁杆和编码器的数据
+
+	}
+	else
+	{
+		Myprintf("Error Command!");
+	}
+}
+ */
 
 
 

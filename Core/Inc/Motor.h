@@ -19,8 +19,6 @@ typedef struct
 
     float Error;
 }_Motor;
-extern _Motor Motor;//此处定义了一个全局变量无需再去定义main.c新的变量
-
 
 
 void Motor_Init(void);

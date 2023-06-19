@@ -29,7 +29,6 @@
 #include "Motor.h"
 #include "OLED.h"
 #include "MPU6050.h"
-#include "HCSR04.h"
 #include "Serial.h"
 /* USER CODE END Includes */
 
@@ -62,7 +61,7 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+_Motor Motor;
 /* USER CODE END 0 */
 
 /**
@@ -116,11 +115,15 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    MPU6050_Read_Accel();
-    MPU6050_Read_Gyro();
-    MPU6050_Read_Temp();
 
-    Myprintf("%.2f,   %.2f    %.2f\r\n",MPU6050_Data.Accel_X, MPU6050_Data.Accel_Y,MPU6050_Data.Accel_Z);
+//    W1_Control(30);//电机测试程序
+//    W2_Control(30);
+//    GetSpeed(&Motor);
+//    Myprintf("Speed: %.2f,%.2f\r\n",Motor.M1_ActualSpeed, Motor.M2_ActualSpeed);
+//    OLED_ShowSignedNum(0,0,(int )Motor.Temp_W1,3,16);
+//    OLED_ShowSignedNum(0,2,(int )Motor.Temp_W2,3,16);
+//    MPU6050_Read_Gyro();//mpu6050测试程序
+//    Myprintf("Gyro: %.2f,%.2f,%.2f\r\n",MPU6050_Data.Gyro_X, MPU6050_Data.Gyro_Y,MPU6050_Data.Gyro_Z);
     HAL_Delay(200);
     /* USER CODE END WHILE */
 
@@ -169,19 +172,13 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)//每100ms进一次中断
-{
-  uint16_t counter=0;
-  if(htim==(&htim4))
-  {
-    HCSR04_Callback();
-    counter++;
-    if (counter==10000){
-      Encode_CallBack(&Motor);
-      counter=0;
-    }
-  }
-}
+//void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+//{
+//  if(htim==(&htim4))
+//  {//每100ms进一次中断
+//      Encode_CallBack(&Motor);
+//  }
+//}
 /* USER CODE END 4 */
 
 /**
