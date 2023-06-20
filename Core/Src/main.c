@@ -30,6 +30,8 @@
 #include "OLED.h"
 #include "MPU6050.h"
 #include "Serial.h"
+#include "settings.h"
+#include "PidContorl.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -50,7 +52,10 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+/**PID环**/
+PID vertical;//直立环
+PID velocity;//速度环
+PID turn;//转向环
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -109,6 +114,11 @@ int main(void)
 //  OLED_ShowString(0,2,"AglX:",16);
 //  OLED_ShowString(0,4,"AglY:",16);
 //  OLED_ShowString(0,6,"AglZ:",16);
+
+    /**PID**/
+    pid_init(&velocity,SPEED_PID_KP,SPEED_PID_KI,0);
+    pid_init(&vertical,POSITION_PID_KP,0,POSITION_PID_KD);
+    pid_init(&turn,ANGLE_PID_KP,0,0);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -116,15 +126,7 @@ int main(void)
   while (1)
   {
 
-//    W1_Control(60);//电机测试程序
-//    W2_Control(60);
-//    GetSpeed(&Motor);
-//    Myprintf("Speed: %.2f,%.2f\r\n",Motor.M1_ActualSpeed, Motor.M2_ActualSpeed);
-//    OLED_ShowSignedNum(0,0,(int )Motor.Temp_W1,3,16);
-//    OLED_ShowSignedNum(0,2,(int )Motor.Temp_W2,3,16);
-//    MPU6050_Read_Gyro();//mpu6050测试程序
-//    Myprintf("Gyro: %.2f,%.2f,%.2f\r\n",MPU6050_Data.Gyro_X, MPU6050_Data.Gyro_Y,MPU6050_Data.Gyro_Z);
-//    HAL_Delay(200);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

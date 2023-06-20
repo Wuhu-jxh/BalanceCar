@@ -1,0 +1,15 @@
+cmake_minimum_required(VERSION 3.25)
+project(test CXX)
+include_directories(../Core/Inc)
+set(CMAKE_C_COMPILER gcc)
+set(CMAKE_CXX_COMPILER g++)
+set(CMAKE_ASM_COMPILER  gcc)
+set(CMAKE_AR ar)
+set(CMAKE_OBJCOPY objcopy)
+set(CMAKE_OBJDUMP objdump)
+set(CMAKE_SIZE size)
+
+add_executable(buildTest buildTest.cpp)
+add_test(NAME buildTest COMMAND buildTest)
+#add_executable(TestFilter TestFilter.cpp)
+

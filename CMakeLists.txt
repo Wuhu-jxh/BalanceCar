@@ -1,4 +1,5 @@
-#此文件从模板自动生成! 请勿更改!
+#姝ゆ枃浠朵粠妯℃澘鑷姩鐢熸垚! 璇峰嬁鏇存敼!
+add_subdirectory(./Ctest)
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_VERSION 1)
 cmake_minimum_required(VERSION 3.25)
@@ -71,3 +72,6 @@ add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
         COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${PROJECT_NAME}.elf> ${BIN_FILE}
         COMMENT "Building ${HEX_FILE}
 Building ${BIN_FILE}")
+
+
+
