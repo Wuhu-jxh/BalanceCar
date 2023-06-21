@@ -2,6 +2,8 @@
 // Created by 神奇bug在哪里 on 6/20/23.
 //
 
+#include "MPU6050.h"
+
 #ifndef BALANCECAR_FLITER_H
 #define BALANCECAR_FLITER_H
 typedef struct
@@ -59,4 +61,6 @@ void kalman_fliter_cal(Kalman * kalman,float in, float *out);
 void round_fliter_init(RoundFliter *roundFliter, int size);
 void round_fliter_cal(RoundFliter *roundFliter, float in, float *out);
 
+void any_fliter_run(void * anyStruct,float in,float *out);
+void MPU6050_filter(_MPU6050_DATA *mpu6050_data_in, _MPU6050_DATA *mpu6050_data_out);
 #endif //BALANCECAR_FLITER_H

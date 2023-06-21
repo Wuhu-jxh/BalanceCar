@@ -48,11 +48,32 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 #if CORE_PID_FILTER_MODE == 1  || CORE_PID_FILTER_MODE == 3
-Lag lag;
+Lag lag; //For test
+Lag MPU_accX;
+Lag MPU_accY;
+Lag MPU_accZ;
+Lag MPU_gyroX;
+Lag MPU_gyroY;
+Lag MPU_gyroZ;
+
 #elif CORE_PID_FILTER_MODE == 2
-Kalman kalman;
+Kalman kalman; //For test
+KalmanMPU_accX;
+Kalman MPU_accY;
+Kalman MPU_accZ;
+Kalman MPU_gyroX;
+Kalman MPU_gyroY;
+Kalman MPU_gyroZ;
+
 #elif CORE_PID_FILTER_MODE == 4
 RoundFliter roundFliter;
+RoundFliter MPU_accX;
+RoundFliter MPU_accY;
+RoundFliter MPU_accZ;
+RoundFliter MPU_gyroX;
+RoundFliter MPU_gyroY;
+RoundFliter MPU_gyroZ;
+
 #endif
 /* USER CODE END PM */
 
@@ -65,6 +86,9 @@ PID velocity;//速度环
 PID turn;//转向环
 /**电机控制**/
 extern _Motor _motor; //电机结构体
+_MPU6050_DATA _mpu_filtered;
+
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -131,7 +155,7 @@ int main(void)
     pid_init(&vertical,POSITION_PID_KP,0,POSITION_PID_KD);
     pid_init(&turn,ANGLE_PID_KP,0,0);
 
-    /**滤波**/
+    /**滤波初始化**/
 #if CORE_PID_FILTER_MODE == 1  || CORE_PID_FILTER_MODE == 3
     lag_fliter_init(&lag,CORE_PID_FILTER_LAG);
 #elif CORE_PID_FILTER_MODE == 2
@@ -151,10 +175,16 @@ int main(void)
       /****数据读取区域结束****/
 //理论上需要滤波的数据为: 角度，加速度。
       /****滤波区域****/
-
+      MPU6050_filter(&MPU6050_Data,&_mpu_filtered);
+///需要更多的数据测试
       /****角度换算****/
-
+      Angle offset_angle = offsetAngleCal(_mpu_filtered.Accel_X,_mpu_filtered.Accel_Y,_mpu_filtered.Accel_Z,
+                                   _mpu_filtered.Gyro_X,_mpu_filtered.Gyro_Y,_mpu_filtered.Gyro_Z);
+///需要确定-机械中值
+///理论上PID仅需要修复某一个轴的偏差就行
       /***PID控制区域***/
+
+///需要确定-机械中值和offset
 
 
     /* USER CODE END WHILE */

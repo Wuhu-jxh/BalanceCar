@@ -61,7 +61,7 @@
  * @param 3 -- 一阶滞后滤波
  * @param 4 -- 均值滤波
  */
-#define CORE_PID_FILTER_MODE 1 //滤波模式
+#define CORE_PID_FILTER_MODE 4 //滤波模式
 
 /**
  * @attention 特别说明
