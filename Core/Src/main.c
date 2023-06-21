@@ -30,6 +30,9 @@
 #include "OLED.h"
 #include "MPU6050.h"
 #include "Serial.h"
+#include "settings.h"
+#include "PidContorl.h"
+#include "fliter.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -44,12 +47,47 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
+#if CORE_PID_FILTER_MODE == 1  || CORE_PID_FILTER_MODE == 3
+Lag lag; //For test
+Lag MPU_accX;
+Lag MPU_accY;
+Lag MPU_accZ;
+Lag MPU_gyroX;
+Lag MPU_gyroY;
+Lag MPU_gyroZ;
 
+#elif CORE_PID_FILTER_MODE == 2
+Kalman kalman; //For test
+KalmanMPU_accX;
+Kalman MPU_accY;
+Kalman MPU_accZ;
+Kalman MPU_gyroX;
+Kalman MPU_gyroY;
+Kalman MPU_gyroZ;
+
+#elif CORE_PID_FILTER_MODE == 4
+RoundFliter roundFliter;
+RoundFliter MPU_accX;
+RoundFliter MPU_accY;
+RoundFliter MPU_accZ;
+RoundFliter MPU_gyroX;
+RoundFliter MPU_gyroY;
+RoundFliter MPU_gyroZ;
+
+#endif
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+/**PID环**/
+PID vertical;//直立环
+PID velocity;//速度环
+PID turn;//转向环
+/**电机控制**/
+extern _Motor _motor; //电机结构体
+_MPU6050_DATA _mpu_filtered;
+
 
 /* USER CODE END PV */
 
@@ -64,6 +102,8 @@ void SystemClock_Config(void);
 _Motor Motor;
 /* USER CODE END 0 */
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "EndlessLoop"
 /**
   * @brief  The application entry point.
   * @retval int
@@ -109,28 +149,51 @@ int main(void)
 //  OLED_ShowString(0,2,"AglX:",16);
 //  OLED_ShowString(0,4,"AglY:",16);
 //  OLED_ShowString(0,6,"AglZ:",16);
+
+    /**PID**/
+    pid_init(&velocity,SPEED_PID_KP,SPEED_PID_KI,0);
+    pid_init(&vertical,POSITION_PID_KP,0,POSITION_PID_KD);
+    pid_init(&turn,ANGLE_PID_KP,0,0);
+
+    /**滤波初始化**/
+#if CORE_PID_FILTER_MODE == 1  || CORE_PID_FILTER_MODE == 3
+    lag_fliter_init(&lag,CORE_PID_FILTER_LAG);
+#elif CORE_PID_FILTER_MODE == 2
+    kalman_fliter_init(&kalman,CORE_PID_FILTER_KALMAN_Q,CORE_PID_FILTER_KALMAN_R,CORE_PID_FILTER_KALMAN_K);
+#elif CORE_PID_FILTER_MODE == 4
+    round_fliter_init(&roundFliter,CORE_PID_FILTER_BUFFER_SIZE);
+#endif
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+      MPU6050_Read_Accel();
+      MPU6050_Read_Gyro();
+      GetSpeed(&Motor);
+      /****数据读取区域结束****/
+//理论上需要滤波的数据为: 角度，加速度。
+      /****滤波区域****/
+      MPU6050_filter(&MPU6050_Data,&_mpu_filtered);
+///需要更多的数据测试
+      /****角度换算****/
+      Angle offset_angle = offsetAngleCal(_mpu_filtered.Accel_X,_mpu_filtered.Accel_Y,_mpu_filtered.Accel_Z,
+                                   _mpu_filtered.Gyro_X,_mpu_filtered.Gyro_Y,_mpu_filtered.Gyro_Z);
+///需要确定-机械中值
+///理论上PID仅需要修复某一个轴的偏差就行
+      /***PID控制区域***/
 
-//    W1_Control(60);//电机测试程序
-//    W2_Control(60);
-//    GetSpeed(&Motor);
-//    Myprintf("Speed: %.2f,%.2f\r\n",Motor.M1_ActualSpeed, Motor.M2_ActualSpeed);
-//    OLED_ShowSignedNum(0,0,(int )Motor.Temp_W1,3,16);
-//    OLED_ShowSignedNum(0,2,(int )Motor.Temp_W2,3,16);
-//    MPU6050_Read_Gyro();//mpu6050测试程序
-//    Myprintf("Gyro: %.2f,%.2f,%.2f\r\n",MPU6050_Data.Gyro_X, MPU6050_Data.Gyro_Y,MPU6050_Data.Gyro_Z);
-//    HAL_Delay(200);
+///需要确定-机械中值和offset
+
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
 }
+#pragma clang diagnostic pop
 
 /**
   * @brief System Clock Configuration
@@ -179,6 +242,7 @@ void SystemClock_Config(void)
 //      Encode_CallBack(&Motor);
 //  }
 //}
+
 /* USER CODE END 4 */
 
 /**
@@ -209,6 +273,7 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
      ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+    OLED_ShowString(0,40,"Assert Error",16);
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */

@@ -5,3 +5,6 @@
 /.idea/modules.xml
 /.idea/runConfigurations/OCD_BalanceCar.xml
 /.idea/vcs.xml
+/cmake-build-debug-stm32/
+/.osx.project
+/.idea/encodings.xml
