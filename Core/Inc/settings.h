@@ -61,7 +61,7 @@
  * @param 3 -- 一阶滞后滤波
  * @param 4 -- 均值滤波
  */
-#define CORE_PID_FILTER_MODE 0 //滤波模式
+#define CORE_PID_FILTER_MODE 1 //滤波模式
 
 /**
  * @attention 特别说明
@@ -79,14 +79,35 @@
  * 缺点是滤波效果不够理想，不能有效地分离出有用的信号成分，而且会引入相位延迟，影响系统的响应速度。
  */
 #if CORE_PID_FILTER_MODE == 1
+#undef CORE_PID_FILTER_MODE
 #define CORE_PID_FILTER_MODE 3 //一阶状态下这两个算法的代码一致，可以复用
 #elif CORE_PID_FILTER_MODE == 2
 #define CORE_PID_FILTER_KALMAN_Q 0.02f //卡尔曼滤波Q
 #define CORE_PID_FILTER_KALMAN_R 0.5f //卡尔曼滤波R
-#elif CORE_PID_FILTER_MODE == 3
+#define CORE_PID_FILTER_KALMAN_K 0.0f //卡尔曼滤波K
+#endif
+#if CORE_PID_FILTER_MODE == 3
 #define CORE_PID_FILTER_LAG 0.5f //一阶滞后滤波系数
 #elif CORE_PID_FILTER_MODE == 4
-#define CORE_PID_FILTER_MEAN 0.5f //均值滤波系数
+#define CORE_PID_FILTER_BUFFER_SIZE 20 //均值滤波缓冲区大小
 #endif
+
+/*****电机控制参数*****/
+/*定义电机的PWM驱动Timer 以及旋转编码器的接口Timer以及引脚*/
+#define	Motor_Timer1	htim1
+#define Encoder_Timer1 htim2
+#define Encoder_Timer2 htim3
+#define Encoder_TimeCounter htim4//其中Encoder_TimeCounter是用于计算速度的
+#define	Motor1	TIM_CHANNEL_1
+#define	Motor2	TIM_CHANNEL_4
+
+/******角度计算参数******/
+#define X_ACCEL_OFFSET 0
+#define Y_ACCEL_OFFSET 0
+#define Z_ACCEL_OFFSET 0
+#define X_GYRO_OFFSET 0
+#define Y_GYRO_OFFSET 0
+#define Z_GYRO_OFFSET 0
+#define PI 3.1415926535897
 
 #endif //BALANCECAR_SETTINGS_H

@@ -23,9 +23,19 @@ typedef struct
     float Left;
     float Right;
 }result;
+typedef struct
+{
+    float x;
+    float y;
+    float z;
+    float pitch;
+    float roll;
+    float yaw;
+}Angle;
 void pid_init(PID *pid, float Kp, float Ki, float Kd);
 float pid_calc(PID *pid, float target, float actual);
 result
 pid_cycle(PID *pid1, PID *pid2, PID *pid3, float target1, float target2, float target3, float actual1, float actual2,
           float actual3);
+Angle offsetAngleCal(float accX, float accY, float accZ, float gyroX, float gyroY, float gyroZ);
 #endif //BALANCECAR_PIDCONTORL_H

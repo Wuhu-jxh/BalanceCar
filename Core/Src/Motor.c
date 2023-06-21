@@ -5,15 +5,7 @@
 #include "stm32f1xx_hal_tim.h"
 #include "stm32f1xx_hal_gpio.h"
 #include "Motor.h"
-/*定义电机的PWM驱动Timer 以及旋转编码器的接口Timer以及引脚
-
- */
-#define	Motor_Timer1	htim1
-#define Encoder_Timer1 htim2
-#define Encoder_Timer2 htim3
-#define Encoder_TimeCounter htim4//其中Encoder_TimeCounter是用于计算速度的
-#define	Motor1	TIM_CHANNEL_1
-#define	Motor2	TIM_CHANNEL_4
+#include "settings.h"
 
 _Motor _motor;
 

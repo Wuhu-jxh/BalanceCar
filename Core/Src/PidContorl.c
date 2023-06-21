@@ -2,6 +2,7 @@
 // Created by 神奇bug在哪里 on 6/20/23.
 //
 
+#include <math.h>
 #include "PidContorl.h"
 #include "settings.h"
 /**
@@ -60,4 +61,18 @@ result pid_cycle(PID *pid1, PID *pid2, PID *pid3, float target1, float target2, 
     LIMIT(right,100);
     result res = {left,right};
     return res;
+}
+Angle offsetAngleCal(float accX, float accY, float accZ, float gyroX, float gyroY, float gyroZ)
+{
+    Angle  ang;
+    ang.pitch = atan2f(accY, accZ) * 180 / PI;
+    ang.roll = atan2f(-accX, accZ) * 180 / PI;
+    ang.yaw = atan2f(accX, accY) * 180 / PI;
+    float gyroXangle = gyroX * 0.0000611;
+    float gyroYangle = gyroY * 0.0000611;
+    float gyroZangle = gyroZ * 0.0000611;
+    ang.x = 0.98 * (gyroXangle + gyroX) + 0.02 * ang.pitch;
+    ang.y = 0.98 * (gyroYangle + gyroY) + 0.02 * ang.roll;
+    ang.z = 0.98 * (gyroZangle + gyroZ) + 0.02 * ang.yaw;
+    return ang;
 }
