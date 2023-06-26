@@ -201,6 +201,7 @@ int main(void)
 ///需要确定-机械中值和offset
       W1_Control(pidOut.Left);
       W2_Control(pidOut.Right);
+      Myprintf("Left:%f\tRight:%f\r\n",pidOut.Left,pidOut.Right);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

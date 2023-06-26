@@ -4,7 +4,8 @@
 
 #ifndef BALANCECAR_V1_0_MPU6050_H
 #define BALANCECAR_V1_0_MPU6050_H
-#include "main.h"
+//#include "main.h"
+#include <stdint-gcc.h>
 #include "settings.h"
 //原先的所有定义均已移动至settings.h中
 
