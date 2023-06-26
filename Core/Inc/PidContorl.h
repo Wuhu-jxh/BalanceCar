@@ -23,8 +23,8 @@ typedef struct
 } PID;
 typedef struct
 {
-    int32_t Left;
-    int32_t Right;
+    long Left;
+    long Right;
 }result;
 typedef struct
 {
