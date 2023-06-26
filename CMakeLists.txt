@@ -1,5 +1,8 @@
 #此文件从模板自动生成! 请勿更改!
-add_subdirectory(./Ctest)
+IF (CMAKE_SYSTEM_NAME MATCHES "Windows")
+ELSE (CMAKE_SYSTEM_NAME MATCHES "Windows")
+    add_subdirectory(./Ctest)
+ENDIF (CMAKE_SYSTEM_NAME MATCHES "Windows")
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_VERSION 1)
 cmake_minimum_required(VERSION 3.25)
