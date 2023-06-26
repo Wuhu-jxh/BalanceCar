@@ -175,23 +175,29 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+  while (1) {
       MPU6050_Read_Accel();
       MPU6050_Read_Gyro();
       GetSpeed(&Motor);
       /****数据读取区域结束****/
 //理论上需要滤波的数据为: 角度，加速度。
       /****滤波区域****/
-      MPU6050_filter(&MPU6050_Data,&_mpu_filtered);
+      MPU6050_filter(&MPU6050_Data, &_mpu_filtered);
 ///需要更多的数据测试
       /****角度换算****/
-      Angle offset_angle = offsetAngleCal(_mpu_filtered.Accel_X,_mpu_filtered.Accel_Y,_mpu_filtered.Accel_Z,
-                                   _mpu_filtered.Gyro_X,_mpu_filtered.Gyro_Y,_mpu_filtered.Gyro_Z);
+      Angle offset_angle = offsetAngleCal(_mpu_filtered.Accel_X, _mpu_filtered.Accel_Y, _mpu_filtered.Accel_Z,
+                                          _mpu_filtered.Gyro_X, _mpu_filtered.Gyro_Y, _mpu_filtered.Gyro_Z);
 ///需要确定-机械中值
 ///理论上PID仅需要修复某一个轴的偏差就行
+      /**状态判断**/
+      if (globalState == STATE_BLANCE)
+      {
+          targetSpeed=0;
+          targetAngle=0;
+      }
+      //
       /***PID控制区域***/
-    result pidOut = PID_Cycal(_mpu_filtered,Motor.M1_ActualSpeed,Motor.M2_ActualSpeed,targetSpeed,targetAngle,offset_angle);
+      result pidOut = PID_Cycal(_mpu_filtered,Motor.M1_ActualSpeed,Motor.M2_ActualSpeed,targetSpeed,targetAngle,offset_angle);
 ///需要确定-机械中值和offset
       W1_Control(pidOut.Left);
       W2_Control(pidOut.Right);
@@ -243,13 +249,13 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-//void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-//{
-//  if(htim==(&htim4))
-//  {//每100ms进一次中断
-//      Encode_CallBack(&Motor);
-//  }
-//}
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  if(htim==(&Encoder_TimeCounter))
+  {//每100ms进一次中断
+      Encode_CallBack(&Motor);
+  }
+}
 
 /* USER CODE END 4 */
 
