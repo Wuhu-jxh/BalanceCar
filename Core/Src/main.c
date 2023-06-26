@@ -37,7 +37,12 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+typedef enum
+{
+    STATE_BLANCE,
+    STATE_FLLOW,
+    STATE_PICKUP
+}State;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -87,8 +92,10 @@ PID turn;//转向环
 /**电机控制**/
 extern _Motor _motor; //电机结构体
 _MPU6050_DATA _mpu_filtered;
-
-
+/**状态机**/
+State globalState;
+/**全局运动控制**/
+float targetSpeed=0,targetAngle=0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -150,10 +157,11 @@ int main(void)
 //  OLED_ShowString(0,4,"AglY:",16);
 //  OLED_ShowString(0,6,"AglZ:",16);
 
-    /**PID**/
-    pid_init(&velocity,SPEED_PID_KP,SPEED_PID_KI,0);
-    pid_init(&vertical,POSITION_PID_KP,0,POSITION_PID_KD);
-    pid_init(&turn,ANGLE_PID_KP,0,0);
+///该PID方法已弃用，采用新的方案
+//    /**PID**/
+//    pid_init(&velocity,SPEED_PID_KP,SPEED_PID_KI,0);
+//    pid_init(&vertical,POSITION_PID_KP,0,POSITION_PID_KD);
+//    pid_init(&turn,ANGLE_PID_KP,0,0);
 
     /**滤波初始化**/
 #if CORE_PID_FILTER_MODE == 1  || CORE_PID_FILTER_MODE == 3
@@ -183,10 +191,10 @@ int main(void)
 ///需要确定-机械中值
 ///理论上PID仅需要修复某一个轴的偏差就行
       /***PID控制区域***/
-
+    result pidOut = PID_Cycal(_mpu_filtered,Motor.M1_ActualSpeed,Motor.M2_ActualSpeed,targetSpeed,targetAngle,offset_angle);
 ///需要确定-机械中值和offset
-
-
+      W1_Control(pidOut.Left);
+      W2_Control(pidOut.Right);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

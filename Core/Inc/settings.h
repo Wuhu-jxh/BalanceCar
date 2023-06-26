@@ -108,6 +108,8 @@
 #define X_GYRO_OFFSET 0
 #define Y_GYRO_OFFSET 0
 #define Z_GYRO_OFFSET 0
+#define Med_Value 0.0f
+///机械中值
 #define PI 3.1415926535897
 
 #endif //BALANCECAR_SETTINGS_H

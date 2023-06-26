@@ -4,6 +4,9 @@
 
 #ifndef BALANCECAR_PIDCONTORL_H
 #define BALANCECAR_PIDCONTORL_H
+
+#include "MPU6050.h"
+
 #define LIMIT(x,y) if(x>y)x=y;else if(x<-y)x=-y;else x=x
 typedef struct
 {
@@ -20,8 +23,8 @@ typedef struct
 } PID;
 typedef struct
 {
-    float Left;
-    float Right;
+    int32_t Left;
+    int32_t Right;
 }result;
 typedef struct
 {
@@ -34,8 +37,7 @@ typedef struct
 }Angle;
 void pid_init(PID *pid, float Kp, float Ki, float Kd);
 float pid_calc(PID *pid, float target, float actual);
-result
-pid_cycle(PID *pid1, PID *pid2, PID *pid3, float target1, float target2, float target3, float actual1, float actual2,
-          float actual3);
+///以上PID计算方法已弃用
+result PID_Cycal(_MPU6050_DATA mpuData,float encoder_L,float encoder_R,float targetSpeed,float targetAngle,Angle angleData);
 Angle offsetAngleCal(float accX, float accY, float accZ, float gyroX, float gyroY, float gyroZ);
 #endif //BALANCECAR_PIDCONTORL_H
