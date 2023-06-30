@@ -4,6 +4,7 @@
 #include "settings.h"
 #include "fliter.h"
 #include "stdlib.h"
+#include <assert.h>
 #if CORE_PID_FILTER_MODE == 1  || CORE_PID_FILTER_MODE == 3
 extern Lag MPU_accX;
 extern Lag MPU_accY;
@@ -86,10 +87,14 @@ void any_fliter_run(void * anyStruct,float in,float *out)
 }
 void MPU6050_filter(_MPU6050_DATA *mpu6050_data_in, _MPU6050_DATA *mpu6050_data_out)
 {
+    assert(mpu6050_data_in!=NULL);
+    assert(mpu6050_data_out!=NULL);
+#if CORE_PID_FILTER_MODE !=0
     any_fliter_run(&MPU_accX, mpu6050_data_in->Accel_X, &mpu6050_data_out->Accel_X);
     any_fliter_run(&MPU_accY, mpu6050_data_in->Accel_Y, &mpu6050_data_out->Accel_Y);
     any_fliter_run(&MPU_accZ, mpu6050_data_in->Accel_Z, &mpu6050_data_out->Accel_Z);
     any_fliter_run(&MPU_gyroX, mpu6050_data_in->Gyro_X, &mpu6050_data_out->Gyro_X);
     any_fliter_run(&MPU_gyroY, mpu6050_data_in->Gyro_Y, &mpu6050_data_out->Gyro_Y);
     any_fliter_run(&MPU_gyroZ, mpu6050_data_in->Gyro_Z, &mpu6050_data_out->Gyro_Z);
+#endif
 }

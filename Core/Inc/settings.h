@@ -61,7 +61,7 @@
  * @param 3 -- 一阶滞后滤波
  * @param 4 -- 均值滤波
  */
-#define CORE_PID_FILTER_MODE 4 //滤波模式
+#define CORE_PID_FILTER_MODE 0 //滤波模式
 
 /**
  * @attention 特别说明
@@ -108,6 +108,8 @@
 #define X_GYRO_OFFSET 0
 #define Y_GYRO_OFFSET 0
 #define Z_GYRO_OFFSET 0
+#define Med_Value 0.0f
+///机械中值
 #define PI 3.1415926535897
 
 #endif //BALANCECAR_SETTINGS_H

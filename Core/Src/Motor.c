@@ -89,21 +89,21 @@ void Encode_CallBack(_Motor *speed)
   __HAL_TIM_SET_COUNTER(&Encoder_Timer1, 0);
   __HAL_TIM_SET_COUNTER(&Encoder_Timer2, 0);//将两个计数器清零
 }
-/***********************************************************
-*@名称 :HAL_TIM_PeriodElapsedCallback
-*@描述	:定时器的回调函数,如果有冲突请将其放在main.c中，来调用Encode_CallBack更新计数值
-*@参数	:TIM_HandleTypeDef
-*@返回值	:无
-*@作者	:JCML
-*@日期	:2023-06-18
-***********************************************************/
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)//每100ms进一次中断
-{
-  if(htim==(&Encoder_TimeCounter))
-  {
-    _motor.Temp_W1 = ((short)__HAL_TIM_GET_COUNTER(&Encoder_Timer1));//读取M1的旋转次数,此处取的是霍尔编码器一周计数加一
-    _motor.Temp_W2 = ((short)__HAL_TIM_GET_COUNTER(&Encoder_Timer2));//读取M2的旋转次数
-    __HAL_TIM_SET_COUNTER(&Encoder_Timer1, 0);
-    __HAL_TIM_SET_COUNTER(&Encoder_Timer2, 0);//将两个计数器清零
-  }
-}
+///***********************************************************
+//*@名称 :HAL_TIM_PeriodElapsedCallback
+//*@描述	:定时器的回调函数,如果有冲突请将其放在main.c中，来调用Encode_CallBack更新计数值
+//*@参数	:TIM_HandleTypeDef
+//*@返回值	:无
+//*@作者	:JCML
+//*@日期	:2023-06-18
+//***********************************************************/
+//void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)//每100ms进一次中断
+//{
+//  if(htim==(&Encoder_TimeCounter))
+//  {
+//    _motor.Temp_W1 = ((short)__HAL_TIM_GET_COUNTER(&Encoder_Timer1));//读取M1的旋转次数,此处取的是霍尔编码器一周计数加一
+//    _motor.Temp_W2 = ((short)__HAL_TIM_GET_COUNTER(&Encoder_Timer2));//读取M2的旋转次数
+//    __HAL_TIM_SET_COUNTER(&Encoder_Timer1, 0);
+//    __HAL_TIM_SET_COUNTER(&Encoder_Timer2, 0);//将两个计数器清零
+//  }
+//}
