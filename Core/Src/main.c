@@ -96,6 +96,9 @@ _MPU6050_DATA _mpu_filtered;
 State globalState;
 /**全局运动控制**/
 float targetSpeed=0,targetAngle=0;
+
+/**串口通讯临时缓冲区**/
+char serialBuffer[256];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -201,7 +204,7 @@ int main(void)
 ///需要确定-机械中值和offset
       W1_Control(pidOut.Left);
       W2_Control(pidOut.Right);
-      Myprintf("Left:%f\tRight:%f\r\n",pidOut.Left,pidOut.Right);
+//      Myprintf("Left:%f\tRight:%f\r\n",pidOut.Left,pidOut.Right);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
