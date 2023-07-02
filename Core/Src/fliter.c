@@ -96,5 +96,12 @@ void MPU6050_filter(_MPU6050_DATA *mpu6050_data_in, _MPU6050_DATA *mpu6050_data_
     any_fliter_run(&MPU_gyroX, mpu6050_data_in->Gyro_X, &mpu6050_data_out->Gyro_X);
     any_fliter_run(&MPU_gyroY, mpu6050_data_in->Gyro_Y, &mpu6050_data_out->Gyro_Y);
     any_fliter_run(&MPU_gyroZ, mpu6050_data_in->Gyro_Z, &mpu6050_data_out->Gyro_Z);
+#else
+    mpu6050_data_out->Accel_X = mpu6050_data_in->Accel_X;
+    mpu6050_data_out->Accel_Y = mpu6050_data_in->Accel_Y;
+    mpu6050_data_out->Accel_Z = mpu6050_data_in->Accel_Z;
+    mpu6050_data_out->Gyro_X = mpu6050_data_in->Gyro_X;
+    mpu6050_data_out->Gyro_Y = mpu6050_data_in->Gyro_Y;
+    mpu6050_data_out->Gyro_Z = mpu6050_data_in->Gyro_Z;
 #endif
 }
