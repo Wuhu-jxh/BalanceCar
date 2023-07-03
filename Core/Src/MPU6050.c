@@ -2,6 +2,7 @@
 // Created by mulai on 2023/6/18.
 //
 
+#include <math.h>
 #include "MPU6050.h"
 #include "i2c.h"
 
@@ -148,3 +149,45 @@ void MPU6050_Read_Temp(void)
 }
 
 
+
+void MPU6050_Read_DMP(void)
+{
+    //从MPU6050读取DMP解算数据
+    uint8_t Read_Buf[14];
+    I2C_Read(MPU6050Addr,0x3B,Read_Buf,14);
+    MPU6050_Data.Accel_X = (int16_t)(Read_Buf[0] << 8 | Read_Buf[1]);
+    MPU6050_Data.Accel_Y = (int16_t)(Read_Buf[2] << 8 | Read_Buf[3]);
+    MPU6050_Data.Accel_Z = (int16_t)(Read_Buf[4] << 8 | Read_Buf[5]);
+    MPU6050_Data.Temp = (int16_t)(Read_Buf[6] << 8 | Read_Buf[7]);
+    MPU6050_Data.Gyro_X = (int16_t)(Read_Buf[8] << 8 | Read_Buf[9]);
+    MPU6050_Data.Gyro_Y = (int16_t)(Read_Buf[10] << 8 | Read_Buf[11]);
+    MPU6050_Data.Gyro_Z = (int16_t)(Read_Buf[12] << 8 | Read_Buf[13]);
+    //计算DMP
+    MPU6050_Data.Accel_X = MPU6050_Data.Accel_X / 16384.0f;
+    MPU6050_Data.Accel_Y = MPU6050_Data.Accel_Y / 16384.0f;
+    MPU6050_Data.Accel_Z = MPU6050_Data.Accel_Z / 16384.0f;
+    MPU6050_Data.Gyro_X = MPU6050_Data.Gyro_X / 131.0f;
+    MPU6050_Data.Gyro_Y = MPU6050_Data.Gyro_Y / 131.0f;
+    MPU6050_Data.Gyro_Z = MPU6050_Data.Gyro_Z / 131.0f;
+    MPU6050_Data.Temp = 36.53f + ((float )MPU6050_Data.Temp / 340.0f);
+    //计算俯仰角和横滚角
+    MPU6050_Data.DMP_Pitch = asinf(-2 * MPU6050_Data.Accel_X * MPU6050_Data.Accel_Z + 2 * MPU6050_Data.Accel_Y * MPU6050_Data.Accel_Y) * 57.3;
+    MPU6050_Data.DMP_Roll = atan2f(2 * MPU6050_Data.Accel_X * MPU6050_Data.Accel_Y + 2 * MPU6050_Data.Accel_Z * MPU6050_Data.Accel_Y, -2 * MPU6050_Data.Accel_X * MPU6050_Data.Accel_X - 2 * MPU6050_Data.Accel_Y * MPU6050_Data.Accel_Y + 1) * 57.3;
+    //计算航向角
+    MPU6050_Data.DMP_Yaw = atan2f(2 * MPU6050_Data.Accel_X * MPU6050_Data.Accel_Y + 2 * MPU6050_Data.Accel_Z * MPU6050_Data.Accel_Y, -2 * MPU6050_Data.Accel_X * MPU6050_Data.Accel_X - 2 * MPU6050_Data.Accel_Y * MPU6050_Data.Accel_Y + 1) * 57.3;
+    //计算角速度
+    MPU6050_Data.Gyro_X = MPU6050_Data.Gyro_X / 131.0f;
+    MPU6050_Data.Gyro_Y = MPU6050_Data.Gyro_Y / 131.0f;
+    MPU6050_Data.Gyro_Z = MPU6050_Data.Gyro_Z / 131.0f;
+//    //计算角速度积分
+//    MPU6050_Data.Gyro_X_Int = MPU6050_Data.Gyro_X_Int + MPU6050_Data.Gyro_X * 0.01;
+//    MPU6050_Data.Gyro_Y_Int = MPU6050_Data.Gyro_Y_Int + MPU6050_Data.Gyro_Y * 0.01;
+//    MPU6050_Data.Gyro_Z_Int = MPU6050_Data.Gyro_Z_Int + MPU6050_Data.Gyro_Z * 0.01;
+//    //计算角速度积分修正
+//    MPU6050_Data.Gyro_X_Int = MPU6050_Data.Gyro_X_Int + 0.0001 * MPU6050_Data.Roll;
+//    MPU6050_Data.Gyro_Y_Int = MPU6050_Data.Gyro_Y_Int - 0.0001 * MPU6050_Data.Pitch;
+//    MPU6050_Data.Gyro_Z_Int = MPU6050_Data.Gyro_Z_Int - 0.0001 * MPU6050_Data.Yaw;
+//
+
+
+}

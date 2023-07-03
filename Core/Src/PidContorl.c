@@ -107,7 +107,7 @@ float PID_TURN(int angleOffset)
 result PID_Cycal(_MPU6050_DATA mpuData,float encoder_L,float encoder_R,float targetSpeed,float targetAngle,Angle angleData)
 {
     float speedOut = PID_SPEED(targetSpeed,encoder_L,encoder_R);
-    float positionOut = PID_POSITION(speedOut+Med_Value,angleData.roll,mpuData.Gyro_Y);
+    float positionOut = PID_POSITION(speedOut+Med_Value,angleData.pitch,angleData.x);
     float turnOut = PID_TURN(mpuData.Gyro_Z-targetAngle);
     result res;
     res.Left = positionOut -turnOut;

@@ -85,19 +85,19 @@ RoundFliter MPU_gyroZ;
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-/**PID»·**/
-PID vertical;//Ö±Á¢»·
-PID velocity;//ËÙ¶È»·
-PID turn;//×ªÏò»·
-/**µç»ú¿ØÖÆ**/
-extern _Motor _motor; //µç»ú½á¹¹Ìå
+/**PIDï¿½ï¿½**/
+PID vertical;//Ö±ï¿½ï¿½ï¿½ï¿½
+PID velocity;//ï¿½Ù¶È»ï¿½
+PID turn;//×ªï¿½ï¿½
+/**ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½**/
+extern _Motor _motor; //ï¿½ï¿½ï¿½ï¿½á¹¹ï¿½ï¿½
 _MPU6050_DATA _mpu_filtered;
-/**×´Ì¬»ú**/
+/**×´Ì¬ï¿½ï¿½**/
 State globalState;
-/**È«¾ÖÔË¶¯¿ØÖÆ**/
+/**È«ï¿½ï¿½ï¿½Ë¶ï¿½ï¿½ï¿½ï¿½ï¿½**/
 float targetSpeed=0,targetAngle=0;
 
-/**´®¿ÚÍ¨Ñ¶ÁÙÊ±»º³åÇø**/
+/**ï¿½ï¿½ï¿½ï¿½Í¨Ñ¶ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½**/
 char serialBuffer[256];
 /* USER CODE END PV */
 
@@ -112,8 +112,6 @@ void SystemClock_Config(void);
 _Motor Motor;
 /* USER CODE END 0 */
 
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "EndlessLoop"
 /**
   * @brief  The application entry point.
   * @retval int
@@ -155,18 +153,18 @@ int main(void)
   OLED_Init();
   USART1_Init();
   MPU6050_Init(I2C_Serch());
-//  OLED_ShowString(0,0,"Temp:",16);//²âÊÔ³ÌÐò
+//  OLED_ShowString(0,0,"Temp:",16);//ï¿½ï¿½ï¿½Ô³ï¿½ï¿½ï¿½
 //  OLED_ShowString(0,2,"AglX:",16);
 //  OLED_ShowString(0,4,"AglY:",16);
 //  OLED_ShowString(0,6,"AglZ:",16);
 
-///¸ÃPID·½·¨ÒÑÆúÓÃ£¬²ÉÓÃÐÂµÄ·½°¸
+///ï¿½ï¿½PIDï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÂµÄ·ï¿½ï¿½ï¿½
 //    /**PID**/
 //    pid_init(&velocity,SPEED_PID_KP,SPEED_PID_KI,0);
 //    pid_init(&vertical,POSITION_PID_KP,0,POSITION_PID_KD);
 //    pid_init(&turn,ANGLE_PID_KP,0,0);
 
-    /**ÂË²¨³õÊ¼»¯**/
+    /**ï¿½Ë²ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½**/
 #if CORE_PID_FILTER_MODE == 1  || CORE_PID_FILTER_MODE == 3
     lag_fliter_init(&lag,CORE_PID_FILTER_LAG);
 #elif CORE_PID_FILTER_MODE == 2
@@ -182,26 +180,26 @@ int main(void)
       MPU6050_Read_Accel();
       MPU6050_Read_Gyro();
       GetSpeed(&Motor);
-      /****Êý¾Ý¶ÁÈ¡ÇøÓò½áÊø****/
-//ÀíÂÛÉÏÐèÒªÂË²¨µÄÊý¾ÝÎª: ½Ç¶È£¬¼ÓËÙ¶È¡£
-      /****ÂË²¨ÇøÓò****/
+      /****ï¿½ï¿½ï¿½Ý¶ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½****/
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½Ë²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª: ï¿½Ç¶È£ï¿½ï¿½ï¿½ï¿½Ù¶È¡ï¿½
+      /****ï¿½Ë²ï¿½ï¿½ï¿½ï¿½ï¿½****/
       MPU6050_filter(&MPU6050_Data, &_mpu_filtered);
-///ÐèÒª¸ü¶àµÄÊý¾Ý²âÊÔ
-      /****½Ç¶È»»Ëã****/
+///ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý²ï¿½ï¿½ï¿½
+      /****ï¿½Ç¶È»ï¿½ï¿½ï¿½****/
       Angle offset_angle = offsetAngleCal(_mpu_filtered.Accel_X, _mpu_filtered.Accel_Y, _mpu_filtered.Accel_Z,
                                           _mpu_filtered.Gyro_X, _mpu_filtered.Gyro_Y, _mpu_filtered.Gyro_Z);
-///ÐèÒªÈ·¶¨-»úÐµÖÐÖµ
-///ÀíÂÛÉÏPID½öÐèÒªÐÞ¸´Ä³Ò»¸öÖáµÄÆ«²î¾ÍÐÐ
-      /**×´Ì¬ÅÐ¶Ï**/
+///ï¿½ï¿½ÒªÈ·ï¿½ï¿½-ï¿½ï¿½Ðµï¿½ï¿½Öµ
+///ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½PIDï¿½ï¿½ï¿½ï¿½Òªï¿½Þ¸ï¿½Ä³Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Æ«ï¿½ï¿½ï¿½ï¿½ï¿½
+      /**×´Ì¬ï¿½Ð¶ï¿½**/
       if (globalState == STATE_BLANCE)
       {
           targetSpeed=0;
           targetAngle=0;
       }
       //
-      /***PID¿ØÖÆÇøÓò***/
+      /***PIDï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½***/
       result pidOut = PID_Cycal(_mpu_filtered,Motor.M1_ActualSpeed,Motor.M2_ActualSpeed,targetSpeed,targetAngle,offset_angle);
-///ÐèÒªÈ·¶¨-»úÐµÖÐÖµºÍoffset
+///ï¿½ï¿½ÒªÈ·ï¿½ï¿½-ï¿½ï¿½Ðµï¿½ï¿½Öµï¿½ï¿½offset
       W1_Control(pidOut.Left);
       W2_Control(pidOut.Right);
 //      Myprintf("Left:%f\tRight:%f\r\n",pidOut.Left,pidOut.Right);
@@ -211,7 +209,6 @@ int main(void)
   }
   /* USER CODE END 3 */
 }
-#pragma clang diagnostic pop
 
 /**
   * @brief System Clock Configuration
@@ -256,7 +253,7 @@ void SystemClock_Config(void)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   if(htim==(&Encoder_TimeCounter))
-  {//Ã¿100ms½øÒ»´ÎÖÐ¶Ï
+  {//Ã¿100msï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ð¶ï¿½
       Encode_CallBack(&Motor);
   }
 }

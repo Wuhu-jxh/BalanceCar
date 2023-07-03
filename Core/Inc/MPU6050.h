@@ -20,9 +20,14 @@ typedef struct{
     float Gyro_Z;
     // ÎÂ¶È
     float Temp;
+    // DMP
+    float DMP_Pitch;
+    float DMP_Roll;
+    float DMP_Yaw;
 }_MPU6050_DATA;
 
 extern _MPU6050_DATA MPU6050_Data;
+
 
 int16_t I2C_Serch(void);
 int8_t MPU6050_Init(int16_t Addr);
@@ -33,5 +38,5 @@ int8_t I2C_Write(uint16_t DevAddr, uint16_t MemAddr, uint8_t *iData, uint8_t Dat
 void MPU6050_Read_Accel(void);
 void MPU6050_Read_Gyro(void);
 void MPU6050_Read_Temp(void);
-
+void MPU6050_Read_DMP(void);
 #endif //BALANCECAR_V1_0_MPU6050_H

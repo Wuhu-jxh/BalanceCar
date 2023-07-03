@@ -34,19 +34,19 @@
 #define MPU6050_ADDR 0xD0	// MPU6050手册上的地址，这里也可以使用serch函数去搜索
 
 /************PID环_速度环参数*************/
-#define SPEED_PID_KP 0.5f
-#define SPEED_PID_KI 0.0f
+#define SPEED_PID_KP 0
+#define SPEED_PID_KI 0
 //速度环不应有KD
 #define GLOBAL_PID_LIMIT 1000 //PID积分抗饱和
 /************PID环_角度环(转向环)参数*************/
-#define ANGLE_PID_KP 0.5f
+#define ANGLE_PID_KP 0
 //角度环不应有KI
 //角度环不应有KD
 
 /************PID环_位置环(直立环)参数*************/
-#define POSITION_PID_KP 0.5f
+#define POSITION_PID_KP -0.3f
 //位置环不应有KI
-#define POSITION_PID_KD 0.0f
+#define POSITION_PID_KD 0.003f
 #define POSITION_PID_TARGET 0.0f
 
 /************PID_核心参数*************/

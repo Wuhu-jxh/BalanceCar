@@ -1,8 +1,4 @@
 #此文件从模板自动生成! 请勿更改!
-IF (CMAKE_SYSTEM_NAME MATCHES "Windows")
-ELSE (CMAKE_SYSTEM_NAME MATCHES "Windows")
-    add_subdirectory(./Ctest)
-ENDIF (CMAKE_SYSTEM_NAME MATCHES "Windows")
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_VERSION 1)
 cmake_minimum_required(VERSION 3.25)
@@ -75,6 +71,3 @@ add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
         COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${PROJECT_NAME}.elf> ${BIN_FILE}
         COMMENT "Building ${HEX_FILE}
 Building ${BIN_FILE}")
-
-
-
