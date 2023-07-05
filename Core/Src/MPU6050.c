@@ -11,7 +11,7 @@
 #include "inv_mpu_dmp_motion_driver.h"
 #include "mpu.h"
 #include "invensense.h"
-
+#include "assert.h"
 #define I2C_Channel hi2c2 //定义当前使用的I2C的通道
 
 _MPU6050_DATA MPU6050_Data;
@@ -23,8 +23,7 @@ static struct platform_data_s gyro_pdata = {
                          0, 1, 0,
                          0, 0, 1}
 };
-int set_int_enable(unsigned char enable);
-
+long gyro=0,  accel=0;
 
 
 
@@ -179,20 +178,21 @@ void MPU6050_Read_Temp(void)
 
 void MPU6050_DMP_init()
 {
-     mpu_init(NULL); //这里似乎并不需要什么东西
-        mpu_set_sensors(INV_XYZ_GYRO | INV_XYZ_ACCEL | INV_XYZ_COMPASS);//设置传感器
-        mpu_configure_fifo(INV_XYZ_GYRO | INV_XYZ_ACCEL);//设置FIFO
-        mpu_set_sample_rate(DEFAULT_MPU_HZ);//设置采样率
-        dmp_load_motion_driver_firmware();//加载DMP固件
-        dmp_set_orientation(inv_orientation_matrix_to_scalar(gyro_pdata.orientation));//设置陀螺仪方向
-        dmp_enable_feature(DMP_FEATURE_6X_LP_QUAT | DMP_FEATURE_TAP |
+    int errorCheck=0;
+    errorCheck += mpu_init(NULL); //这里似乎并不需要什么东西
+    errorCheck +=   mpu_set_sensors(INV_XYZ_GYRO | INV_XYZ_ACCEL | INV_XYZ_COMPASS);//设置传感器
+    errorCheck +=    mpu_configure_fifo(INV_XYZ_GYRO | INV_XYZ_ACCEL);//设置FIFO
+    errorCheck +=    mpu_set_sample_rate(DEFAULT_MPU_HZ);//设置采样率
+    errorCheck +=    dmp_load_motion_driver_firmware();//加载DMP固件
+    errorCheck +=   dmp_set_orientation(inv_orientation_matrix_to_scalar(gyro_pdata.orientation));//设置陀螺仪方向
+    errorCheck +=   dmp_enable_feature(DMP_FEATURE_6X_LP_QUAT | DMP_FEATURE_TAP |
                            DMP_FEATURE_ANDROID_ORIENT | DMP_FEATURE_SEND_RAW_ACCEL | DMP_FEATURE_SEND_CAL_GYRO |
                            DMP_FEATURE_GYRO_CAL);//设置DMP功能
-        dmp_set_fifo_rate(DEFAULT_MPU_HZ);//设置FIFO速率
-        mpu_set_dmp_state(1);//使能DMP
-        dmp_set_interrupt_mode(DMP_INT_CONTINUOUS);//设置DMP中断模式
-        set_int_enable(1);//使能MPU6050中断
-
+    errorCheck +=    dmp_set_fifo_rate(DEFAULT_MPU_HZ);//设置FIFO速率
+    errorCheck +=    mpu_set_dmp_state(1);//使能DMP
+    errorCheck +=    dmp_set_interrupt_mode(DMP_INT_CONTINUOUS);//设置DMP中断模式
+    mpu_run_self_test(&gyro, &accel); //自检
+    assert(errorCheck == 0);
 }
 
 void MPU6050_Read_DMP(void)
