@@ -221,7 +221,6 @@ void DMA1_Channel5_IRQHandler(void)
     // 这里疑似是HAL库函数的bug，具体可以参考我给的链接
     // huart1,hdma_usart1_tx 的状态要手动复位成READY状态
     // 不然发送函数会一直以为通道忙，就不再发送数据了！
-
   }
   HAL_DMA_IRQHandler(&hdma_usart1_tx);
 }

@@ -24,6 +24,7 @@ void USART1_TX_Wait(void);//·¢ËÍµÈ´ýº¯Êý
 uint8_t GetRxFlag(void);
 void StringTrans(void);
 float GetRxValue(char *Str, uint8_t lenth);
+
 #endif
 
 
