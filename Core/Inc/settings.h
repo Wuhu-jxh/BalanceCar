@@ -10,7 +10,6 @@
 #define CONFIG       0x1A  // 低通滤波频率，典型值：0x06(5Hz) */
 #define GYRO_CONFIG  0x1B  // 陀螺仪自检及测量范围，典型值：0x18(不自检，2000deg/s) */
 #define ACCEL_CONFIG 0x1C  // 加速计自检、测量范围及高通滤波频率，典型值：0x01(不自检，2G，5Hz) */
-
 #define ACCEL_XOUT_H 0x43  // 存储最近的X轴、Y轴、Z轴加速度感应器的测量值 */
 #define ACCEL_XOUT_L 0x44
 #define ACCEL_YOUT_H 0x45
@@ -33,20 +32,23 @@
 #define WHO_AM_I     0x75 	// IIC地址寄存器(默认数值0x68，只读) */
 #define MPU6050_ADDR 0xD0	// MPU6050手册上的地址，这里也可以使用serch函数去搜索
 
+
+#define DEFAULT_MPU_HZ 50 //MPU6050采样频率
+
 /************PID环_速度环参数*************/
-#define SPEED_PID_KP 0.5f
-#define SPEED_PID_KI 0.0f
+#define SPEED_PID_KP 0
+#define SPEED_PID_KI 0
 //速度环不应有KD
 #define GLOBAL_PID_LIMIT 1000 //PID积分抗饱和
 /************PID环_角度环(转向环)参数*************/
-#define ANGLE_PID_KP 0.5f
+#define ANGLE_PID_KP 0
 //角度环不应有KI
 //角度环不应有KD
 
 /************PID环_位置环(直立环)参数*************/
-#define POSITION_PID_KP 0.5f
+#define POSITION_PID_KP -0.3f
 //位置环不应有KI
-#define POSITION_PID_KD 0.0f
+#define POSITION_PID_KD 0.003f
 #define POSITION_PID_TARGET 0.0f
 
 /************PID_核心参数*************/
