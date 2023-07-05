@@ -5,11 +5,28 @@
 #include <math.h>
 #include "MPU6050.h"
 #include "i2c.h"
+#include "Serial.h"
+#include "settings.h"
+#include "inv_mpu.h"
+#include "inv_mpu_dmp_motion_driver.h"
+#include "mpu.h"
+#include "invensense.h"
 
 #define I2C_Channel hi2c2 //定义当前使用的I2C的通道
 
 _MPU6050_DATA MPU6050_Data;
 static int16_t MPU6050Addr = 0xD0;//定义初始的MPU6050的从机地址，如果固定且已知就可直接用定义而不用再去调用I2C_Serch函数
+
+
+static struct platform_data_s gyro_pdata = {
+        .orientation = { 1, 0, 0,
+                         0, 1, 0,
+                         0, 0, 1}
+};
+int set_int_enable(unsigned char enable);
+
+
+
 
 
 /***********************************************************
@@ -24,10 +41,22 @@ int8_t I2C_Read(uint16_t DevAddr, uint16_t MemAddr, uint8_t *oData, uint8_t Data
 {
   return HAL_I2C_Mem_Read(&I2C_Channel,DevAddr,MemAddr,1,oData,Datalen,1000);
 }
-
+int8_t I2C_Readn(unsigned char slave_addr, unsigned char reg_addr, unsigned short len,
+                 unsigned char *data_ptr)
+{
+    return HAL_I2C_Mem_Read(&I2C_Channel,slave_addr,reg_addr,sizeof(reg_addr),data_ptr,len,1000);
+}
+int8_t I2C_Writen(unsigned char slave_addr, unsigned char reg_addr, unsigned short len,
+                  unsigned char *data_ptr){
+    return HAL_I2C_Mem_Write(&I2C_Channel,slave_addr,reg_addr,sizeof(reg_addr),data_ptr,len,1000);
+}
 int8_t I2C_Write(uint16_t DevAddr, uint16_t MemAddr, uint8_t *iData,uint8_t Datalen)
 {
   return HAL_I2C_Mem_Write(&I2C_Channel,DevAddr,MemAddr,1,iData,Datalen,1000);
+}
+int8_t I2C_Writei(uint16_t DevAddr, uint16_t MemAddr, uint8_t iData,uint8_t Datalen)
+{
+    return HAL_I2C_Mem_Write(&I2C_Channel,DevAddr,MemAddr,1,&iData,Datalen,1000);
 }
 
 /***********************************************************
@@ -148,46 +177,52 @@ void MPU6050_Read_Temp(void)
   MPU6050_Data.Temp = 36.53f + ((float )MPU6050_Data.Temp / 340.0f);//转换计算
 }
 
+void MPU6050_DMP_init()
+{
+     mpu_init(NULL); //这里似乎并不需要什么东西
+        mpu_set_sensors(INV_XYZ_GYRO | INV_XYZ_ACCEL | INV_XYZ_COMPASS);//设置传感器
+        mpu_configure_fifo(INV_XYZ_GYRO | INV_XYZ_ACCEL);//设置FIFO
+        mpu_set_sample_rate(DEFAULT_MPU_HZ);//设置采样率
+        dmp_load_motion_driver_firmware();//加载DMP固件
+        dmp_set_orientation(inv_orientation_matrix_to_scalar(gyro_pdata.orientation));//设置陀螺仪方向
+        dmp_enable_feature(DMP_FEATURE_6X_LP_QUAT | DMP_FEATURE_TAP |
+                           DMP_FEATURE_ANDROID_ORIENT | DMP_FEATURE_SEND_RAW_ACCEL | DMP_FEATURE_SEND_CAL_GYRO |
+                           DMP_FEATURE_GYRO_CAL);//设置DMP功能
+        dmp_set_fifo_rate(DEFAULT_MPU_HZ);//设置FIFO速率
+        mpu_set_dmp_state(1);//使能DMP
+        dmp_set_interrupt_mode(DMP_INT_CONTINUOUS);//设置DMP中断模式
+        set_int_enable(1);//使能MPU6050中断
 
+}
 
 void MPU6050_Read_DMP(void)
 {
-    //从MPU6050读取DMP解算数据
-    uint8_t Read_Buf[14];
-    I2C_Read(MPU6050Addr,0x3B,Read_Buf,14);
-    MPU6050_Data.Accel_X = (int16_t)(Read_Buf[0] << 8 | Read_Buf[1]);
-    MPU6050_Data.Accel_Y = (int16_t)(Read_Buf[2] << 8 | Read_Buf[3]);
-    MPU6050_Data.Accel_Z = (int16_t)(Read_Buf[4] << 8 | Read_Buf[5]);
-    MPU6050_Data.Temp = (int16_t)(Read_Buf[6] << 8 | Read_Buf[7]);
-    MPU6050_Data.Gyro_X = (int16_t)(Read_Buf[8] << 8 | Read_Buf[9]);
-    MPU6050_Data.Gyro_Y = (int16_t)(Read_Buf[10] << 8 | Read_Buf[11]);
-    MPU6050_Data.Gyro_Z = (int16_t)(Read_Buf[12] << 8 | Read_Buf[13]);
-    //计算DMP
-    MPU6050_Data.Accel_X = MPU6050_Data.Accel_X / 16384.0f;
-    MPU6050_Data.Accel_Y = MPU6050_Data.Accel_Y / 16384.0f;
-    MPU6050_Data.Accel_Z = MPU6050_Data.Accel_Z / 16384.0f;
-    MPU6050_Data.Gyro_X = MPU6050_Data.Gyro_X / 131.0f;
-    MPU6050_Data.Gyro_Y = MPU6050_Data.Gyro_Y / 131.0f;
-    MPU6050_Data.Gyro_Z = MPU6050_Data.Gyro_Z / 131.0f;
-    MPU6050_Data.Temp = 36.53f + ((float )MPU6050_Data.Temp / 340.0f);
-    //计算俯仰角和横滚角
-    MPU6050_Data.DMP_Pitch = asinf(-2 * MPU6050_Data.Accel_X * MPU6050_Data.Accel_Z + 2 * MPU6050_Data.Accel_Y * MPU6050_Data.Accel_Y) * 57.3;
-    MPU6050_Data.DMP_Roll = atan2f(2 * MPU6050_Data.Accel_X * MPU6050_Data.Accel_Y + 2 * MPU6050_Data.Accel_Z * MPU6050_Data.Accel_Y, -2 * MPU6050_Data.Accel_X * MPU6050_Data.Accel_X - 2 * MPU6050_Data.Accel_Y * MPU6050_Data.Accel_Y + 1) * 57.3;
-    //计算航向角
-    MPU6050_Data.DMP_Yaw = atan2f(2 * MPU6050_Data.Accel_X * MPU6050_Data.Accel_Y + 2 * MPU6050_Data.Accel_Z * MPU6050_Data.Accel_Y, -2 * MPU6050_Data.Accel_X * MPU6050_Data.Accel_X - 2 * MPU6050_Data.Accel_Y * MPU6050_Data.Accel_Y + 1) * 57.3;
-    //计算角速度
-    MPU6050_Data.Gyro_X = MPU6050_Data.Gyro_X / 131.0f;
-    MPU6050_Data.Gyro_Y = MPU6050_Data.Gyro_Y / 131.0f;
-    MPU6050_Data.Gyro_Z = MPU6050_Data.Gyro_Z / 131.0f;
-//    //计算角速度积分
-//    MPU6050_Data.Gyro_X_Int = MPU6050_Data.Gyro_X_Int + MPU6050_Data.Gyro_X * 0.01;
-//    MPU6050_Data.Gyro_Y_Int = MPU6050_Data.Gyro_Y_Int + MPU6050_Data.Gyro_Y * 0.01;
-//    MPU6050_Data.Gyro_Z_Int = MPU6050_Data.Gyro_Z_Int + MPU6050_Data.Gyro_Z * 0.01;
-//    //计算角速度积分修正
-//    MPU6050_Data.Gyro_X_Int = MPU6050_Data.Gyro_X_Int + 0.0001 * MPU6050_Data.Roll;
-//    MPU6050_Data.Gyro_Y_Int = MPU6050_Data.Gyro_Y_Int - 0.0001 * MPU6050_Data.Pitch;
-//    MPU6050_Data.Gyro_Z_Int = MPU6050_Data.Gyro_Z_Int - 0.0001 * MPU6050_Data.Yaw;
-//
-
-
+    unsigned long sensor_timestamp;
+    short gyro[3], accel[3], sensors;
+    unsigned char more;
+    long quat[4];
+    float q0,q1,q2,q3;
+    dmp_read_fifo(gyro, accel, quat, &sensor_timestamp, &sensors, &more);
+    int q30 = 1073741824;
+    q0 = quat[0] / q30;
+    q1 = quat[1] / q30;
+    q2 = quat[2] / q30;
+    q3 = quat[3] / q30;
+    MPU6050_Data.Quat_W = q0;
+    MPU6050_Data.Quat_X = q1;
+    MPU6050_Data.Quat_Y = q2;
+    MPU6050_Data.Quat_Z = q3;
+    MPU6050_Data.Gyro_X = gyro[0];
+    MPU6050_Data.Gyro_Y = gyro[1];
+    MPU6050_Data.Gyro_Z = gyro[2];
+    MPU6050_Data.Accel_X = accel[0];
+    MPU6050_Data.Accel_Y = accel[1];
+    MPU6050_Data.Accel_Z = accel[2];
+    MPU6050_Data.Time = sensor_timestamp;
+    MPU6050_Data.Sensors = sensors;
+    MPU6050_Data.More = more;
+    //获取姿态角
+    MPU6050_Data.DMP_Roll = atan2(2 * q0 * q1 + q2 * q3, q0 * q0 + q3 * q3 - q1 * q1 - q2 * q2) * 57.3;
+    MPU6050_Data.DMP_Pitch = asin(-2 * q1 * q3 + 2 * q0 * q2) * 57.3;
+    MPU6050_Data.DMP_Yaw = atan2(2 * q1 * q2 + q0 * q3, q0 * q0 + q1 * q1 - q2 * q2 - q3 * q3) * 57.3;
 }

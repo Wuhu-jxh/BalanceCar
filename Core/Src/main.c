@@ -33,6 +33,14 @@
 #include "settings.h"
 #include "PidContorl.h"
 #include "fliter.h"
+
+/**  外置MPU6050库  **/
+#include "inv_mpu.h"
+#include "inv_mpu_dmp_motion_driver.h"
+#include "log.h"
+#include "mltypes.h"
+#include "mpu.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -92,6 +100,7 @@ PID turn;//ת��
 /**�������**/
 extern _Motor _motor; //����ṹ��
 _MPU6050_DATA _mpu_filtered;
+extern struct inv_sensor_cal_t sensors;
 /**״̬��**/
 State globalState;
 /**ȫ���˶�����**/
@@ -104,12 +113,18 @@ char serialBuffer[256];
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
+#define BYTE0(dwTemp) (*(char *)(&dwTemp))
+#define BYTE1(dwTemp) (*((char *)(&dwTemp) + 1))
+#define BYTE2(dwTemp) (*((char *)(&dwTemp) + 2))
+#define BYTE3(dwTemp) (*((char *)(&dwTemp) + 3))
+void get_ms_user(unsigned long *count);
+#define get_tick_count get_ms_user
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 _Motor Motor;
+volatile uint32_t hal_timestamp = 0;
 /* USER CODE END 0 */
 
 /**
@@ -152,7 +167,8 @@ int main(void)
   Motor_Init();
   OLED_Init();
   USART1_Init();
-  MPU6050_Init(I2C_Serch());
+//  MPU6050_Init(I2C_Serch())
+
 //  OLED_ShowString(0,0,"Temp:",16);//���Գ���
 //  OLED_ShowString(0,2,"AglX:",16);
 //  OLED_ShowString(0,4,"AglY:",16);
