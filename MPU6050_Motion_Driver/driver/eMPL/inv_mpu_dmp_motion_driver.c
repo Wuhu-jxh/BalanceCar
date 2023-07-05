@@ -626,8 +626,6 @@ int dmp_set_accel_bias(long *bias)
     accel_sf = (long long)accel_sens << 15;
 #ifdef __CLION_IDE__
     __asm__ volatile ("nop");
-#elifdef EMPL_TARGET_STM32F1
-    __NOP();
 #else
     __no_operation();
 #endif
