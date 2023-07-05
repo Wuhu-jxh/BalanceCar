@@ -53,7 +53,7 @@ include_directories(Core/Inc Drivers/STM32F1xx_HAL_Driver/Inc MPU6050_Motion_Dri
 
 add_definitions(-DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB)
 
-file(GLOB_RECURSE SOURCES "Core/*.*" "Drivers/*.*" "MPU6050_Motion_Driver/driver/**/*.c")
+file(GLOB_RECURSE SOURCES "Core/*.*" "Drivers/*.*" "MPU6050_Motion_Driver/driver/eMPL/*.*"  "MPU6050_Motion_Driver/stm32L/*.*" "MPU6050_Motion_Driver/mllite/*.*")
 
 set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32F103C8TX_FLASH.ld)
 
