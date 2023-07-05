@@ -57,10 +57,10 @@ int8_t I2C_Readn(unsigned char slave_addr, unsigned char reg_addr, unsigned shor
                  unsigned char *data_ptr);
 int8_t I2C_Writen(unsigned char slave_addr, unsigned char reg_addr, unsigned short len,
                   unsigned char *data_ptr);
-
+void MPU6050_DMP_init();
 void MPU6050_Read_Accel(void);
 void MPU6050_Read_Gyro(void);
 void MPU6050_Read_Temp(void);
-
+void MPU6050_DMP_init();
 void MPU6050_Read_DMP(void);
 #endif //BALANCECAR_V1_0_MPU6050_H

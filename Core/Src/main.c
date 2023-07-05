@@ -34,12 +34,6 @@
 #include "PidContorl.h"
 #include "fliter.h"
 
-/**  外置MPU6050库  **/
-#include "inv_mpu.h"
-#include "inv_mpu_dmp_motion_driver.h"
-#include "log.h"
-#include "mltypes.h"
-#include "mpu.h"
 
 /* USER CODE END Includes */
 
@@ -125,6 +119,7 @@ void get_ms_user(unsigned long *count);
 /* USER CODE BEGIN 0 */
 _Motor Motor;
 volatile uint32_t hal_timestamp = 0;
+
 /* USER CODE END 0 */
 
 /**
@@ -167,6 +162,7 @@ int main(void)
   Motor_Init();
   OLED_Init();
   USART1_Init();
+  MPU6050_DMP_init();
 //  MPU6050_Init(I2C_Serch())
 
 //  OLED_ShowString(0,0,"Temp:",16);//���Գ���
