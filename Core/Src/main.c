@@ -17,6 +17,7 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include <malloc.h>
 #include "main.h"
 #include "dma.h"
 #include "i2c.h"
@@ -87,18 +88,16 @@ RoundFliter MPU_gyroZ;
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-/**PID��**/
-PID vertical;//ֱ����
-PID velocity;//�ٶȻ�
-PID turn;//ת��
+
 /**�������**/
 extern _Motor _motor; //����ṹ��
 _MPU6050_DATA _mpu_filtered;
 extern struct inv_sensor_cal_t sensors;
 /**״̬��**/
 State globalState;
-/**ȫ���˶�����**/
+//全局控制量
 float targetSpeed=0,targetAngle=0;
+int isAlarm=0;
 
 /**����ͨѶ��ʱ������**/
 char serialBuffer[256];
@@ -112,6 +111,7 @@ void SystemClock_Config(void);
 #define BYTE2(dwTemp) (*((char *)(&dwTemp) + 2))
 #define BYTE3(dwTemp) (*((char *)(&dwTemp) + 3))
 void get_ms_user(unsigned long *count);
+_Bool uartDataProcess(char * rawData);
 #define get_tick_count get_ms_user
 /* USER CODE END PFP */
 
@@ -169,7 +169,6 @@ int main(void)
 //  OLED_ShowString(0,2,"AglX:",16);
 //  OLED_ShowString(0,4,"AglY:",16);
 //  OLED_ShowString(0,6,"AglZ:",16);
-
 ///��PID���������ã������µķ���
 //    /**PID**/
 //    pid_init(&velocity,SPEED_PID_KP,SPEED_PID_KI,0);
@@ -192,6 +191,10 @@ int main(void)
       MPU6050_Read_Accel();
       MPU6050_Read_Gyro();
       GetSpeed(&Motor);
+      if(GetRxFlag())
+      {
+          uartDataProcess(RxDataStr);
+      }
       /****���ݶ�ȡ�������****/
 //��������Ҫ�˲�������Ϊ: �Ƕȣ����ٶȡ�
       /****�˲�����****/
@@ -270,6 +273,37 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   }
 }
 
+
+_Bool uartDataProcess(char * rawData)
+{
+    //例如：2个连续的float，2个int,长度为4，小端序
+    char template[4];
+    for (int i = 0; i < 4; ++i) {
+        template[i] = rawData[i];
+    }
+    //假设第一个数字是目标速度
+    targetSpeed = *(float *) template;
+    for (int i = 0; i < 4; ++i) {
+        template[i] = rawData[i + 4];
+    }
+    //假设第二个数字是目标角度
+    targetAngle = *(float *) template;
+    for (int i = 0; i < 4; ++i) {
+        template[i] = rawData[i + 8];
+    }
+    //假设第三个数字是是否alarm
+    isAlarm = *(int *) template;
+    //假设第四个数字是校验码，固定为1234，在数据结束时必须发送一个这个
+    for (int i = 0; i < 4; ++i) {
+        template[i] = rawData[i + 12];
+    }
+    if (*(int *)template == 1234)
+    {
+        memset(RxDataStr,0,20);
+        return 0;
+    } else
+        return 1;
+}
 /* USER CODE END 4 */
 
 /**
